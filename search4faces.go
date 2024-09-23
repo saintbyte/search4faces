@@ -22,6 +22,9 @@ func (api *API) RateLimit() {
 func (api *API) DetectFaces() {
 
 }
+func (api *API) DetectFacesFiles(filename string) {
+
+}
 func (api *API) SearchFace() {
 
 }
