@@ -1,11 +1,10 @@
 package search4faces
 
-type JSONRPCRequeest struct {
-	Jsonrpc string `json:"jsonrpc"`
-	Method  string `json:"method"`
-	Id      string `json:"id"`
-	Params  struct {
-	} `json:"params"`
+type JSONRPCRequst struct {
+	Jsonrpc string      `json:"jsonrpc"`
+	Method  string      `json:"method"`
+	Id      string      `json:"id"`
+	Params  interface{} `json:"params"`
 }
 type JSONRPCResponse struct {
 	Jsonrpc string   `json:"jsonrpc"`
