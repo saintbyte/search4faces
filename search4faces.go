@@ -10,13 +10,11 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"github.com/google/uuid"
 	"io"
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 )
 
 type API struct {
@@ -30,8 +28,23 @@ func NewSearch4FacesApi() (*API, error) {
 		APIURL: ApiURL,
 	}, nil
 }
-func (api *API) RateLimit() {
+func (api *API) RateLimit() error {
 	//rateLimit
+	RequestObj, err := api.getDefaultRequestData("rateLimit")
+	if err != nil {
+		return err
+	}
+	RequestObj.Params = map[string]string{}
+	jsonRequest, err := json.Marshal(&RequestObj)
+	client, request, _ := api.getRequest(bytes.NewReader(jsonRequest))
+	log.Println(client)
+	log.Println(request)
+	response, e := client.Do(request)
+	if e != nil {
+		log.Fatal(e)
+	}
+	log.Println(response)
+	return nil
 }
 func (api *API) DetectFaces() {
 
@@ -62,6 +75,7 @@ func (api *API) getRequest(data io.Reader) (*http.Client, *http.Request, error) 
 		return nil, nil, err
 	}
 	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("User-Agent", "HTTPie/0.9.6")
 	request.Header.Set("x-authorization-token", api.getApiKey())
 	client := &http.Client{}
 	return client, request, nil
@@ -86,13 +100,15 @@ func (api *API) DetectFacesFiles(filename string) error {
 	}
 	jsonRequest, err := json.Marshal(&RequestObj)
 	client, request, _ := api.getRequest(bytes.NewReader(jsonRequest))
+	log.Println(client)
+	log.Println(request)
 	response, e := client.Do(request)
 	if e != nil {
 		log.Fatal(e)
 	}
-	if response.StatusCode != http.StatusOK {
-		return errors.New("Http error:" + strconv.Itoa(response.StatusCode))
-	}
+	//if response.StatusCode != http.StatusOK {
+	//	return errors.New("Http error:" + strconv.Itoa(response.StatusCode))
+	//}
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return err
@@ -100,9 +116,11 @@ func (api *API) DetectFacesFiles(filename string) error {
 	defer response.Body.Close()
 	log.Println(string(body))
 	return nil
-	//var result EmbeddingsResponse
-	//err = json.Unmarshal(body, &result)
+	var result JSONRPCResponse
+	err = json.Unmarshal(body, &result)
+	log.Println(result)
 	//return result.Data[0].Embedding, nil
+	return nil
 }
 
 func (api *API) SearchFace() {

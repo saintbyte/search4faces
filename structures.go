@@ -7,9 +7,9 @@ type JSONRPCRequst struct {
 	Params  interface{} `json:"params"`
 }
 type JSONRPCResponse struct {
-	Jsonrpc string   `json:"jsonrpc"`
-	Result  struct{} `json:"result"`
-	ID      string   `json:"id"`
+	Jsonrpc string      `json:"jsonrpc"`
+	Result  interface{} `json:"result"`
+	ID      string      `json:"id"`
 }
 type RateResult struct {
 	Apikey    string   `json:"apikey"`
